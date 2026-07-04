@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Precious';
+  src: url('https://db.onlinewebfonts.com/t/49c90cb3ac66877b79ed18b9f8d899d0.eot');
+  src: url('https://db.onlinewebfonts.com/t/49c90cb3ac66877b79ed18b9f8d899d0.eot?#iefix') format('embedded-opentype'),
+       url('https://db.onlinewebfonts.com/t/49c90cb3ac66877b79ed18b9f8d899d0.woff2') format('woff2'),
+       url('https://db.onlinewebfonts.com/t/49c90cb3ac66877b79ed18b9f8d899d0.woff') format('woff'),
+       url('https://db.onlinewebfonts.com/t/49c90cb3ac66877b79ed18b9f8d899d0.ttf') format('truetype'),
+       url('https://db.onlinewebfonts.com/t/49c90cb3ac66877b79ed18b9f8d899d0.svg#Precious') format('svg');
+}
