@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-import { getDb } from '../db.js';
+import { query } from '../db.js';
 import { generateToken, authMiddleware } from '../auth.js';
+import { asyncHandler } from '../asyncHandler.js';
 
 const router = Router();
 
 // Register
-router.post('/register', async (req, res) => {
+router.post('/register', asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -21,29 +22,35 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Password must be at least 4 characters' });
   }
 
-  const db = getDb();
-  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
-  if (existing) {
+  const existing = await query('SELECT id FROM users WHERE username = $1', [username]);
+  if (existing.rows.length > 0) {
     return res.status(409).json({ error: 'Username already taken' });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const result = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, passwordHash);
+  const result = await query(
+    'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id',
+    [username, passwordHash]
+  );
 
-  const token = generateToken(result.lastInsertRowid);
-  res.json({ token, user: { id: result.lastInsertRowid, username } });
-});
+  const userId = result.rows[0].id;
+  const token = generateToken(userId);
+  res.json({ token, user: { id: userId, username } });
+}));
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
-  const db = getDb();
-  const user = db.prepare('SELECT id, username, password_hash FROM users WHERE username = ?').get(username);
+  const result = await query(
+    'SELECT id, username, password_hash FROM users WHERE username = $1',
+    [username]
+  );
+  const user = result.rows[0];
   if (!user) {
     return res.status(401).json({ error: 'Invalid username or password' });
   }
@@ -55,24 +62,23 @@ router.post('/login', async (req, res) => {
 
   const token = generateToken(user.id);
   res.json({ token, user: { id: user.id, username: user.username } });
-});
+}));
 
 // Get current user
-router.get('/me', authMiddleware, (req, res) => {
-  const db = getDb();
-  const user = db.prepare('SELECT id, username FROM users WHERE id = ?').get(req.userId);
+router.get('/me', authMiddleware, asyncHandler(async (req, res) => {
+  const result = await query('SELECT id, username FROM users WHERE id = $1', [req.userId]);
+  const user = result.rows[0];
   if (!user) {
     return res.status(404).json({ error: 'User not found' });
   }
   res.json({ user });
-});
+}));
 
 // Delete account
-router.delete('/account', authMiddleware, (req, res) => {
-  const db = getDb();
-  db.prepare('DELETE FROM scribbles WHERE user_id = ?').run(req.userId);
-  db.prepare('DELETE FROM users WHERE id = ?').run(req.userId);
+router.delete('/account', authMiddleware, asyncHandler(async (req, res) => {
+  await query('DELETE FROM scribbles WHERE user_id = $1', [req.userId]);
+  await query('DELETE FROM users WHERE id = $1', [req.userId]);
   res.json({ success: true });
-});
+}));
 
 export default router;

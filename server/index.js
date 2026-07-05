@@ -25,9 +25,6 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' }));
 
-// Initialize database
-initDb();
-
 // Health check (used by Render)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -37,6 +34,20 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/scribbles', scribbleRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Request error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
+
+// Initialize database, then start the server
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to initialize database:', err);
+    process.exit(1);
+  });

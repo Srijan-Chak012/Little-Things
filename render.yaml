@@ -1,5 +1,9 @@
-# Render Blueprint — deploys both the frontend (static) and backend (web service)
+# Render Blueprint — deploys the frontend (static), backend (web service), and a Postgres database
 # Docs: https://render.com/docs/blueprint-spec
+databases:
+  - name: little-things-db
+    plan: free
+
 services:
   # ---------- Backend API ----------
   - type: web
@@ -13,6 +17,10 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "20"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: little-things-db
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true # Render generates a secure random secret
       - key: CLIENT_ORIGIN

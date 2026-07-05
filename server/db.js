@@ -1,44 +1,54 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import pg from 'pg';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// DB_PATH can be overridden (e.g. a Render persistent disk mount) via the DATA_DIR env var
-const DATA_DIR = process.env.DATA_DIR || __dirname;
-const DB_PATH = path.join(DATA_DIR, 'data.db');
+const { Pool } = pg;
 
-let db;
+// Render provides DATABASE_URL. For local dev, fall back to a local Postgres URL
+// or individual PG* env vars supported natively by node-postgres.
+const connectionString =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/little_things';
 
-export function getDb() {
-  if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma('journal_mode = WAL');
+// Render's managed Postgres requires SSL. Enable it when connecting to a non-local host.
+const useSSL = /render\.com|amazonaws\.com|\bsslmode=require\b/.test(connectionString);
+
+let pool;
+
+export function getPool() {
+  if (!pool) {
+    pool = new Pool({
+      connectionString,
+      ssl: useSSL ? { rejectUnauthorized: false } : false,
+    });
   }
-  return db;
+  return pool;
 }
 
-export function initDb() {
-  const db = getDb();
+/** Run a parameterized query. Returns the pg result. */
+export function query(text, params) {
+  return getPool().query(text, params);
+}
 
-  db.exec(`
+export async function initDb() {
+  await query(`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      created_at TEXT DEFAULT (datetime('now'))
+      created_at TIMESTAMPTZ DEFAULT now()
     );
+  `);
 
+  await query(`
     CREATE TABLE IF NOT EXISTS scribbles (
       id TEXT PRIMARY KEY,
-      user_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       timestamp TEXT NOT NULL,
       image_data TEXT NOT NULL,
       emoji TEXT DEFAULT '',
       tags TEXT DEFAULT '[]',
       description TEXT DEFAULT '',
       name TEXT DEFAULT '',
-      created_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (user_id) REFERENCES users(id)
+      created_at TIMESTAMPTZ DEFAULT now()
     );
   `);
 }
+
