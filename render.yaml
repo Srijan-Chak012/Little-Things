@@ -1,9 +1,6 @@
-# Render Blueprint — deploys the frontend (static), backend (web service), and a Postgres database
+# Render Blueprint — deploys the frontend (static) and backend (web service).
+# The database is hosted on Neon (set DATABASE_URL in the Render dashboard).
 # Docs: https://render.com/docs/blueprint-spec
-databases:
-  - name: little-things-db
-    plan: free
-
 services:
   # ---------- Backend API ----------
   - type: web
@@ -18,9 +15,8 @@ services:
       - key: NODE_VERSION
         value: "20"
       - key: DATABASE_URL
-        fromDatabase:
-          name: little-things-db
-          property: connectionString
+        # Paste your Neon connection string in the Render dashboard on first deploy
+        sync: false
       - key: JWT_SECRET
         generateValue: true # Render generates a secure random secret
       - key: CLIENT_ORIGIN
