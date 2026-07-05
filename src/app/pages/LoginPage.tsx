@@ -35,7 +35,7 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
 
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-gray-900">
-      <div className="w-[390px] h-[844px] flex flex-col bg-gray-50 overflow-hidden shadow-2xl rounded-[3rem] border-8 border-gray-800 relative">
+      <div className="w-full h-full md:w-[390px] md:h-[844px] flex flex-col bg-gray-50 overflow-hidden md:shadow-2xl md:rounded-[3rem] md:border-8 md:border-gray-800 relative">
         {/* Header */}
         <div className="relative bg-white border-b border-gray-200 py-2 px-4">
           <ArchedTitle text="The Little Things" />

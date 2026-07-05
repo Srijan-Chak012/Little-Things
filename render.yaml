@@ -1,0 +1,45 @@
+# Render Blueprint — deploys both the frontend (static) and backend (web service)
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  # ---------- Backend API ----------
+  - type: web
+    name: little-things-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATA_DIR
+        value: /var/data
+      - key: JWT_SECRET
+        generateValue: true # Render generates a secure random secret
+      - key: CLIENT_ORIGIN
+        # Set this to your deployed frontend URL after the first deploy
+        sync: false
+    disk:
+      name: little-things-data
+      mountPath: /var/data
+      sizeGB: 1
+
+  # ---------- Frontend (static site) ----------
+  - type: web
+    name: little-things-web
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: VITE_API_BASE
+        # Set this to your deployed backend URL + /api after the first deploy
+        sync: false
+    routes:
+      # SPA fallback so client-side routing (react-router) works on refresh
+      - type: rewrite
+        source: /*
+        destination: /index.html
