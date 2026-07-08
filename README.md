@@ -8,22 +8,13 @@
 
 _Doodle a thought. Tag a feeling. Relive it later like a story._
 
-<br />
-
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
-![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?logo=postgresql&logoColor=white)
-![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white)
-
 </div>
 
 ---
 
 ## 🌸 What is this?
 
-**The Little Things** is a mobile-first journaling app where your entries aren't words — they're **scribbles**. Sketch whatever's on your mind on a soft dotted canvas, tag it with a mood, a thread, and a little note, then watch your memories come back to you as swipeable stories.
+**The Little Things** is a simple journaling app where your entries aren't words but they're **scribbles**. Sketch whatever's on your mind on a soft dotted canvas, tag it with a mood, a thread, and a little note, then watch your memories come back to you as swipeable stories.
 
 It's part sketchbook, part diary, part time capsule. No pressure, no perfection — just the little things.
 
@@ -32,7 +23,7 @@ It's part sketchbook, part diary, part time capsule. No pressure, no perfection 
 ## 🎨 Features
 
 ### ✏️ The Canvas
-- A calm, dotted drawing surface that feels like a real notebook.
+- A dotted drawing surface that feels like a real notebook.
 - Full **touch support** — draw naturally with your finger on mobile.
 - Adjustable brush colors and sizes via the drawing tools.
 - Your scribble is auto-cropped to just what you drew when you save.
@@ -45,15 +36,15 @@ When you save a scribble, you can attach:
 
 ### 🕰️ Three Ways to Wander Back
 - **Timeline** — every scribble, newest first, in a clean grid.
-- **Vibe** — grouped by emotion. Tap a mood to relive those moments as an **Instagram-style story**.
-- **Threads** — each tag lives in its own rounded card, sitting on a bed of soft, looping artistic threads. Tap one to flip through every drawing in that thread, story-style.
+- **Vibe** — grouped by emotion. Tap a mood to relive those moments.
+- **Threads** — each tag lives in its own rounded card, sitting on a bed of soft, looping artistic threads. Tap one to flip through every drawing in that thread.
 
 ### 🔔 Gentle Nudges
 - Set a delay (hours / minutes) after which a scribble sends you a **notification**.
-- The notification is aesthetic — it shows your drawing, its name, and lovingly prompts you to **add a description or edit** it while the memory is still warm.
+- The notification shows your drawing, its name, and prompts you to **add a description or edit** it while the memory is still warm.
 
 ### 📁 Save to Your Device
-- Optionally link a **device album folder** (via the File System Access API).
+- Optionally link a **device album folder**.
 - Every scribble you draw is also saved there as a real PNG image.
 
 ### 👤 Your Account, Everywhere
