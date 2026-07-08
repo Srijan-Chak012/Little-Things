@@ -4,11 +4,17 @@ const { Pool } = pg;
 
 // Render provides DATABASE_URL. For local dev, fall back to a local Postgres URL
 // or individual PG* env vars supported natively by node-postgres.
-const connectionString =
+const rawConnectionString =
   process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/little_things';
 
-// Render's managed Postgres requires SSL. Enable it when connecting to a non-local host.
-const useSSL = /render\.com|amazonaws\.com|\bsslmode=require\b/.test(connectionString);
+// Enable SSL for managed/cloud databases (Render, Neon, AWS, or any URL requesting SSL).
+const useSSL = /render\.com|neon\.tech|amazonaws\.com|\bsslmode=/.test(rawConnectionString);
+
+// Strip sslmode from the URL so pg doesn't emit a deprecation warning — we set SSL
+// explicitly via the `ssl` option below instead.
+const connectionString = rawConnectionString.replace(/([?&])sslmode=[^&]*&?/i, (match, sep) =>
+  match.endsWith('&') ? sep : ''
+);
 
 let pool;
 
